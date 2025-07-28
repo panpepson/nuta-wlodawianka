@@ -38,6 +38,9 @@ function getMusicFiles($dir = './nuta/') {
     <!-- Canonical URL -->
     <link rel="canonical" href="https://nuta.wlodawa.net/">
     <link rel="shortcut icon" href="./fav-lks.png" type="image/x-icon">
+
+	<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+	<script src="vot.js"></script>
     
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-051XD13E5Y"></script>
@@ -334,8 +337,6 @@ function getMusicFiles($dir = './nuta/') {
 }
 
 </style>
-	<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
-	<script src="vot.js"></script>
 </head>
 <body>
 <span id="cooki" style="display: none;"></span>

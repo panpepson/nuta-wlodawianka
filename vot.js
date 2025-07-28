@@ -51,7 +51,7 @@ function showMessage(text, type = 'info') {
             }
             
             .vote-modal-content.success {
-                 background: linear-gradient(135deg, #ff0000 0%, #0066ff 100%);
+      background: linear-gradient(135deg, #ff0000 0%, #0066ff 100%);
             }
             
             .vote-modal-content.warning {
@@ -139,11 +139,34 @@ function showMessage(text, type = 'info') {
     });
 
     // Dodaj animację zamykania do CSS jeśli nie istnieje
-    if (!styles.textContent.includes('fadeOut')) {
-        styles.textContent += `
+    const existingStyles = document.querySelector('#vote-modal-styles');
+    if (existingStyles && !existingStyles.textContent.includes('fadeOut')) {
+        existingStyles.textContent += `
             @keyframes fadeOut {
                 from { opacity: 1; }
                 to { opacity: 0; }
+            }
+            
+            .vote-button-clicked {
+                animation: voteClick 0.3s ease;
+            }
+            
+            @keyframes voteClick {
+                0% { 
+                    transform: scale(1) rotate(0deg);
+                }
+                25% { 
+                    transform: scale(1.2) rotate(-5deg);
+                }
+                50% { 
+                    transform: scale(1.3) rotate(5deg);
+                }
+                75% { 
+                    transform: scale(1.1) rotate(-2deg);
+                }
+                100% { 
+                    transform: scale(1) rotate(0deg);
+                }
             }
         `;
     }
@@ -192,11 +215,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const voteKey = `LKS-Wlodawianka-TAK-JEST_${track}`;
         
-        function updateScore() {
-            gun.get('LKS-Wlodawianka-TAK-JEST').get(track).once(data => {
-                const score = (data?.up || 0) - (data?.down || 0);
-                scoreSpan.textContent = score;
-            });
+function updateScore() {
+    gun.get('LKS-Wlodawianka-TAK-JEST').get(track).once(data => {
+        const score = (data?.up || 0) - (data?.down || 0);
+        scoreSpan.textContent = score;
+        scoreSpan.style.transition = 'color 0.3s';
+        scoreSpan.style.color = '#00ffcc';
+        setTimeout(() => {
+            scoreSpan.style.color = '';
+        }, 500);
+    });
+}
+
+        function addClickAnimation(button) {
+            button.classList.add('vote-button-clicked');
+            setTimeout(() => {
+                button.classList.remove('vote-button-clicked');
+            }, 300);
         }
 
         function canVoteOnTrack() {
@@ -209,9 +244,9 @@ document.addEventListener('DOMContentLoaded', function () {
             
             // Sprawdź limit 3 kliknięć globalnych
             if (totalClicks >= 3) {
-                showMessage("Brawo Ziom! Takich Fanów Włodawianki <br/> nam trzeba 💪❤️💙🤳", 'success');
+                showMessage("Brawo Ziom! </br>Takich Fanów <strong>Włodawianki</strong><br/> nam trzeba 💪❤️💙🤳", 'success');
                 setTimeout(() => {
-                    window.location.reload();
+                    //window.location.reload();
                 }, 2000);
                 return;
             }
@@ -231,18 +266,22 @@ document.addEventListener('DOMContentLoaded', function () {
                         down: type === 'down' ? down + 1 : down
                     };
                     
-                    gun.get('LKS-Wlodawianka-TAK-JEST').get(track).put(newData);
+                    //gun.get('LKS-Wlodawianka-TAK-JEST').get(track).put(newData);
+gun.get('LKS-Wlodawianka-TAK-JEST').get(track).put(newData, () => {
+    updateScore();
+});
+
                     localStorage.setItem(voteKey, Date.now().toString());
                     votedTracks.add(track);
                     
                     const voteType = type === 'up' ? '👍' : '👎';
-                    showMessage(`Twój głos ${voteType} został zapisany!`, 'success');
+                    showMessage(`Twój głos ${voteType} został zapisany 💪😍 jest OK`, 'success');
                 } else {
                     // Głos nie liczy się, ale user widzi "zmianę"
                     if (votedTracks.has(track)) {
-                        showMessage('Już głosowałeś na ten utwór w tej sesji 😍🤙', 'warning');
+                        showMessage('Już głosowałeś na ten utwór w tej sesji! 😎🤏', 'warning');
                     } else {
-                        showMessage('Już głosowałeś na ten utwór w ciągu 24h, <br/>ale fajnie, że nadal wspierasz nasz klub!</br> 🎵❤️🦹🥁🦹‍♂️💙🎶', 'warning');
+                        showMessage('Już głosowałeś na ten utwór w ciągu 24h<br/> ale fajnie, że nadal wspierasz!<br/> 🎵❤️🦹🥁🦹‍♂️💙🎶', 'warning');
                     }
                 }
                 
